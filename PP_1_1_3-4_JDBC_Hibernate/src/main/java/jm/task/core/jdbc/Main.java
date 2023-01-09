@@ -4,6 +4,7 @@ package jm.task.core.jdbc;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserServiceImpl;
+import jm.task.core.jdbc.util.Util;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,16 +16,11 @@ public class Main {
         Scanner in = new Scanner(System.in);
         String command = new String();
         UserServiceImpl userService = new UserServiceImpl();
-        try (Connection connection = userService.getUserDaoJDBC().getConnection();
-             Statement statement = userService.getUserDaoJDBC().getStatement()){
+        try (Connection connection = Util.connection;
+             Statement statement = Util.statement){
             if (!connection.isClosed()) {
                 System.out.println("соединение с базой данных установлено");
             }
-            UserDaoJDBCImpl userDaoJDBC = new UserDaoJDBCImpl();
-            userService.setUserDaoJDBC(userDaoJDBC);
-            userService.setConnection(connection);
-            userService.setStatement(statement);
-            userService.isExist();
             System.out.println("Жду команды");
             while (!command.equals("exit")){
                 command = in.nextLine();

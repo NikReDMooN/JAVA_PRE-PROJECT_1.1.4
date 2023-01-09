@@ -9,50 +9,23 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-    private Connection connection;
-    private Statement statement;
 
     private boolean exist = false;
 
-    public void isExist(){
-        System.out.println("Начинаю проверку на наличие таблицы");
-        System.out.println("Проверяяю...");
-        DatabaseMetaData md = null;
-        try {
-            md = connection.getMetaData();
-            ResultSet rs = md.getTables(null, null, "TABLE_OF_USERS", null);
-            if (rs.next()) {
-                System.out.println("Таблица найдена");
-                exist = true;
-            } else {
-                System.out.println("Таблица не найдена");
-            }
-            System.out.println("-----------------------------" + "\n\n\n\n");
-        } catch (SQLException e) {
-            System.out.println("обнаружена ошибка " + e);
-        }
-    }
 
     public UserDaoJDBCImpl() {
     }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
 
-    public void setStatement(Statement statement) {
-        this.statement = statement;
-    }
 
     public void createUsersTable() {
-        DatabaseMetaData md = null;
         try {
             if (exist) {
                 System.out.println("Искомая таблица обнаружена");
             } else {
                 System.out.println("Искомая таблица не обнаружена \n" +
                         "попытка её создать");
-                statement.execute("CREATE TABLE `java_pre-project_1.1.4`.`TABLE_OF_USERS` (\n" +
+                Util.statement.execute("CREATE TABLE `java_pre-project_1.1.4`.`TABLE_OF_USERS` (\n" +
                         "  `id` BIGINT NOT NULL AUTO_INCREMENT,\n" +
                         "  `name` VARCHAR(100) NULL,\n" +
                         "  `lastName` VARCHAR(100) NULL,\n" +
@@ -70,11 +43,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
         System.out.println("Начинаю процесс удаления таблицы");
-        DatabaseMetaData md = null;
         try {
             if (exist) {
                 System.out.println("Таблица обнаружена, запускаю процесс удаления");
-                statement.execute("DROP TABLE TABLE_OF_USERS");
+                Util.statement.execute("DROP TABLE TABLE_OF_USERS");
                 System.out.println("Таблица успешно удалена");
                 exist = false;
             } else {
@@ -92,8 +64,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
             if (exist) {
                 System.out.println("Таблица обнаружена, начинаю процесс загрузки");
-                statement.execute("INSERT INTO TABLE_OF_USERS (name, lastName, age)\n"
-                        + "VALUES ('" + name + "' , '" + lastName + "'," + age + ")");
+                Util.connection.prepareStatement("INSERT INTO TABLE_OF_USERS (name, lastName, age)\n"
+                        + "VALUES ('" + name + "' , '" + lastName + "'," + age + ")").execute();
             } else {
                 System.out.println("Таблица не обнаружена, загрузка данных невозможна \n"
                 + "Пожалуйста создадите сначала таблицу");
@@ -108,8 +80,8 @@ public class UserDaoJDBCImpl implements UserDao {
         System.out.println("Удаляю запись с указанным id");
         try {
            if (exist) {
-               statement.execute("        DELETE FROM TABLE_OF_USERS\n" +
-                       "        Where id = " + id);
+               Util.connection.prepareStatement("        DELETE FROM TABLE_OF_USERS\n" +
+                       "        Where id = " + id).execute();
                 System.out.println("Запись успешно удалена");
            } else {
                System.out.println("Таблица не была обнаружена");
@@ -125,7 +97,7 @@ public class UserDaoJDBCImpl implements UserDao {
         System.out.println("Начинаю процесс загрузки данных их базы данных в список");
         ArrayList<User> users = new ArrayList<>();
         try {
-            ResultSet resultSet = statement.executeQuery("Select * FROM TABLE_OF_USERS");
+            ResultSet resultSet = Util.connection.prepareStatement("Select * FROM TABLE_OF_USERS").executeQuery();
             while(resultSet.next()) {
                 users.add(new User(resultSet.getString("name"), resultSet.getString("lastName")
                         ,resultSet.getByte("age") ));
@@ -143,30 +115,34 @@ public class UserDaoJDBCImpl implements UserDao {
         return users;
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
 
-    public Statement getStatement() {
-        return statement;
-    }
 
     public void createConnection() {
-        this.connection = Util.getConnection();
         try {
-            this.statement = connection.createStatement();
-            isExist();
+            PreparedStatement preparedStatement = Util.connection.prepareStatement("SELECT count(*) "
+                    + "FROM information_schema.tables "
+                    + "WHERE table_name = ?"
+                    + "LIMIT 1;");
+            preparedStatement.setString(1, "TABLE_OF_USERS");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            if (resultSet.getInt(1) != 0) {
+                exist = true;
+            } else {
+                exist = false;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        isExist();
+
     }
 
     public void cleanUsersTable() {
         System.out.println("Начинаю процемм удаления всех записей");
         try {
             if (exist) {
-                statement.execute("DELETE FROM TABLE_OF_USERS");
+                Util.connection.prepareStatement("DELETE FROM TABLE_OF_USERS").execute();
                 System.out.println("Таблица была благополучно очищина");
             } else {
                 System.out.println("Таблицы не существует");

@@ -1,7 +1,9 @@
 package jm.task.core.jdbc.service;
 
+import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.util.Util;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -9,28 +11,14 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
-    private UserDaoJDBCImpl userDaoJDBC;
+    private UserDao userDaoJDBC;
 
-    public void setUserDaoJDBC(UserDaoJDBCImpl userDaoJDBC) {
-        this.userDaoJDBC = userDaoJDBC;
-    }
 
     public UserServiceImpl() {
         this.userDaoJDBC = new UserDaoJDBCImpl();
-        this.userDaoJDBC.createConnection();
+        Util.buildConnection(userDaoJDBC);
     }
 
-    public UserDaoJDBCImpl getUserDaoJDBC() {
-        return userDaoJDBC;
-    }
-
-    public void setStatement(Statement statement) {
-        this.userDaoJDBC.setStatement(statement);
-    }
-
-    public void setConnection(Connection connection) {
-        this.userDaoJDBC.setConnection(connection);
-    }
 
     public void createUsersTable() {
         this.userDaoJDBC.createUsersTable();
@@ -52,9 +40,6 @@ public class UserServiceImpl implements UserService {
         return this.userDaoJDBC.getAllUsers();
     }
 
-    public void isExist(){
-        this.userDaoJDBC.isExist();
-    }
 
     public void cleanUsersTable() {
         this.userDaoJDBC.cleanUsersTable();

@@ -13,6 +13,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="JAVA_PRE-PROJECT_1.1.4" options="--add-modules java.sql" />
+      <module name="PP_1_1_3-4_JDBC_Hibernate" options="--add-modules java.sql" />
     </option>
   </component>
 </project>
