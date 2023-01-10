@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl() {
         this.userDaoJDBC = new UserDaoJDBCImpl();
-        Util.buildConnection(userDaoJDBC);
+        Util.buildConnection();
     }
 
 

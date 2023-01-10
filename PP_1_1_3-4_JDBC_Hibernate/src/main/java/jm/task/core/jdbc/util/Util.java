@@ -14,28 +14,22 @@ public class Util {
     private static String user = "root";
     private static String password = "Weskerandrik1!";
 
-    public static Connection connection;
-    public static Statement statement;
+    public static Connection Connection;
 
     private Util(){
     }
 
 
 
-    public static Connection buildConnection(UserDao userDao){
+    public static Connection buildConnection(){
         try {
-            connection = DriverManager.getConnection(URL
+            Connection = DriverManager.getConnection(URL
                     , user
                     , password);
-            statement = connection.createStatement();
-            if (userDao instanceof UserDaoJDBCImpl) {
-                UserDaoJDBCImpl userDaoJDBC = (UserDaoJDBCImpl)userDao;
-                userDaoJDBC.createConnection();
-            }
         } catch (SQLException e) {
             System.out.println("Во время работы возникла ошибка " + e);
         }
-        return connection;
+        return Connection;
     }
 
     // реализуйте настройку соеденения с БД

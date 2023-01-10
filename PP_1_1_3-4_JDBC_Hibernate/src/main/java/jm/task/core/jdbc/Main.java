@@ -1,7 +1,6 @@
 package jm.task.core.jdbc;
 
 
-import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserServiceImpl;
 import jm.task.core.jdbc.util.Util;
@@ -16,8 +15,7 @@ public class Main {
         Scanner in = new Scanner(System.in);
         String command = new String();
         UserServiceImpl userService = new UserServiceImpl();
-        try (Connection connection = Util.connection;
-             Statement statement = Util.statement){
+        try (Connection connection = Util.Connection){
             if (!connection.isClosed()) {
                 System.out.println("соединение с базой данных установлено");
             }
